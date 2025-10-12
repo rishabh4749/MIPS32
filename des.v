@@ -1,12 +1,4 @@
 `timescale 1ns / 1ps
-
-//RISC Implementation of MIPS32 Processor
-
-
-//32 bit processor => Processes 32 bits at a time making the word length of the processor 32
-
-
-//A general overview of the MIPS32 RISC instructions taken into consideration in this project :
   
   //Arithmetic and Logic Operations:
      // 1. ADD Rd,Rs1,Rs2 - Rd=Rs1+Rs2
@@ -78,6 +70,7 @@ reg [31:0] Mem[0:1023];
 parameter 
 
 //OPCODES for instructions to be decoded in the ID stage
+//6 of the most significant bytes of one instruction
 //Register Type Instructions
 //Instructions involving two source registers.
 ADD=6'b000000,SUB=6'b000001,AND=6'b000010,OR=6'b000011,SLT=6'b000100,MUL=6'b000101,HLT=6'b111111,
@@ -86,7 +79,6 @@ ADD=6'b000000,SUB=6'b000001,AND=6'b000010,OR=6'b000011,SLT=6'b000100,MUL=6'b0001
 //Instrcutions involving one source register and one immediate offset.
 LW=6'b001000,SW=6'b001001,ADDI=6'b001010,SUBI=6'b001011,SLTI=6'b001100,BNEQZ=6'b001101,BEQZ=6'b001110;
 
-//No flag registers are there in MIPS32 RISC
 
 //Code for the type of instructions
 parameter RR_ALU=3'b000,RM_ALU=3'b001,LOAD=3'b010,STORE=3'b011,BRANCH=3'b100,HALT=3'b101;
@@ -109,7 +101,7 @@ if(HALTED == 0)
 begin
 
     //There would be a feedback from the EX stage that would tell the IF stage whether or not the previous instruction is a branch instruction along with the information about its condition whether it is satisfied or not.
-    if(((EX_MEM_IR[31:26]==BEQZ) && (EX_MEM_cond == 1)) || ((EX_MEM_IR[31:26] == BNEQZ) && (EX_MEM_cond == 0)))
+  if(((EX_MEM_IR[31:26]==BEQZ) && (EX_MEM_cond == 1)) || ((EX_MEM_IR[31:26] == BNEQZ) && (EX_MEM_cond == 0)))
     
     begin
     
@@ -164,7 +156,6 @@ begin
     ID_EX_A <= #2 Reg[IF_ID_IR[25:21]]; //Assignment in the case of non-zero value.
     
     //Loading of second operand
-    //Same process as the first operand.
     if(IF_ID_IR[20:16]==5'b00000)
     
     ID_EX_B<=0;
@@ -236,7 +227,7 @@ begin
         SUB: EX_MEM_ALUOut <= #2 ID_EX_A - ID_EX_B;
         AND: EX_MEM_ALUOut <= #2 ID_EX_A & ID_EX_B;
         OR: EX_MEM_ALUOut <= #2 ID_EX_A | ID_EX_B;
-        SLT: EX_MEM_ALUOut <= #2 ID_EX_A < ID_EX_B;
+        SLT: EX_MEM_ALUOut <= #2 (ID_EX_A < ID_EX_B);
         MUL: EX_MEM_ALUOut <= #2 ID_EX_A * ID_EX_B;
         default: EX_MEM_ALUOut <= #2 32'hxxxxxxxx;
         
