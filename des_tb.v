@@ -1,28 +1,7 @@
 `timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 21.01.2024 15:02:29
-// Design Name: 
-// Module Name: des_tb
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
 
 
-module des_tb(
-
-    );
+module des_tb();
     reg clk1,clk2;
     integer k;
     
@@ -34,7 +13,7 @@ module des_tb(
     repeat(20)
     begin
     #5 clk1=1;#5 clk1=0;
-    #5 clk2=1; #5clk2=0;
+    #5 clk2=1;#5 clk2=0;
     end
     end
     initial begin
