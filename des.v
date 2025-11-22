@@ -19,6 +19,10 @@
      // 1. BEQZ R1,Label - Branch to Label if R1=0
      // 2. BNEQZ R1,Label - Branch to Label R1 != 0
      
+  //Jump Operations (J-Type - Work in Progress):
+     // 1. J Label - PC = Label
+     // 2. JAL Rd,Label - Rd = PC+1, PC = Label
+     
   //Halt Operations:
      // 1. HLT
      
@@ -77,11 +81,14 @@ ADD=6'b000000,SUB=6'b000001,AND=6'b000010,OR=6'b000011,SLT=6'b000100,MUL=6'b0001
 
 //I Type Instructions (Immediate Instructions)
 //Instrcutions involving one source register and one immediate offset.
-LW=6'b001000,SW=6'b001001,ADDI=6'b001010,SUBI=6'b001011,SLTI=6'b001100,BNEQZ=6'b001101,BEQZ=6'b001110;
+LW=6'b001000,SW=6'b001001,ADDI=6'b001010,SUBI=6'b001011,SLTI=6'b001100,BNEQZ=6'b001101,BEQZ=6'b001110,
+
+//J Type Instructions (Jump Instructions - Work in Progress)
+J=6'b001111,JAL=6'b010000;
 
 
 //Code for the type of instructions
-parameter RR_ALU=3'b000,RM_ALU=3'b001,LOAD=3'b010,STORE=3'b011,BRANCH=3'b100,HALT=3'b101;
+parameter RR_ALU=3'b000,RM_ALU=3'b001,LOAD=3'b010,STORE=3'b011,BRANCH=3'b100,HALT=3'b101,JUMP=3'b110;
 
 //Set after HLT instruction is completed.
 reg HALTED; 
@@ -187,6 +194,9 @@ begin
     
     BNEQZ,BEQZ: ID_EX_type <= #2 BRANCH;
     
+    // J-Type instructions (Work in Progress)
+    J,JAL: ID_EX_type <= #2 JUMP;
+    
     HLT: ID_EX_type <= #2 HALT;
     
     //In case the provided opcode is not valid
@@ -269,6 +279,12 @@ begin
         
     end
     
+    // J-Type instruction execution (Work in Progress)
+    JUMP:begin
+        // TODO: Implement jump target address calculation
+        // EX_MEM_ALUOut <= #2 jump_target_address;
+    end
+    
 endcase
 end
 
@@ -304,6 +320,11 @@ begin
          //Disable write in case TAKEN_BRANCH is 1
          if(TAKEN_BRANCH == 0)  
                  Mem[EX_MEM_ALUOut]<= #2 EX_MEM_B;
+    
+    // J-Type completion (Work in Progress)
+    JUMP:begin
+        // TODO: Handle jump completion
+    end
                  
 endcase
 
@@ -326,6 +347,12 @@ begin
     RR_ALU: Reg[MEM_WB_IR[15:11]] <= #4 MEM_WB_ALUOut;
     RM_ALU: Reg[MEM_WB_IR[20:16]] <= #4 MEM_WB_ALUOut;
     LOAD: Reg[MEM_WB_IR[20:16]] <= #4 MEM_WB_LMD;
+    
+    // J-Type writeback (Work in Progress)
+    JUMP:begin
+        // TODO: Handle JAL register writeback if needed
+    end
+    
     HALT: HALTED <= #2 1'b1;
     
     endcase
